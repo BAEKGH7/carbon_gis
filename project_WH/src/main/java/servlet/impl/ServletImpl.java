@@ -27,12 +27,13 @@ public class ServletImpl extends EgovAbstractServiceImpl implements ServletServi
 	public List<ServletVO> sdlist() {
 		return dao.sdlist();
 	}
-		public List<ServletVO> sgglist() {
-			return dao.sgglist();
+	@Override
+	public List<ServletVO> sgglist() {
+		return dao.sgglist();
 		}
 
-		@Override
-			public List<ServletVO> bjdlist() {
-				return dao.bjdlist();
-	}
+	@Override
+	public List<ServletVO> bjdlist() {
+		return dao.bjdlist();
+		}
 }

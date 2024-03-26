@@ -7,7 +7,7 @@
 		<typeAlias alias="map" type="java.util.Map"/>
 		<typeAlias alias="list" type="java.util.List"/>
 		<typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
-		
 		<typeAlias alias="ServletVO" type="servlet.VO.ServletVO"/>
+		
 	</typeAliases>
 </configuration>
