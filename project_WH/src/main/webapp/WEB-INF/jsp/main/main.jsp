@@ -9,14 +9,14 @@
 <script src="https://code.jquery.com/jquery-3.6.0.js"
 	integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
 	crossorigin="anonymous"></script>
-<script type="text/javascript" src="<c:url value='/js/ol.js' />"></script>
+<%-- <script type="text/javascript" src="<c:url value='/js/ol.js' />"></script> --%>
 <!-- OpenLayer 라이브러리 -->
-<link href="<c:url value='/'/>css/ol.css" rel="stylesheet"
-	type="text/css">
+<%-- <link href="<c:url value='/'/>css/ol.css" rel="stylesheet"
+	type="text/css"> --%>
 <!-- OpenLayer css -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/css/ol.css">
 <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/build/ol.js"></script> 
-<script type="text/javascript" src="<c:url value='./js/mapTest.js' />"></script>
+<script type="text/javascript" src="<c:url value='/js/mapTest.js' />"></script>
 <!-- 지도 맵객체 생성을 위한 js-->
 <!-- 지도 크기 설정을 위한 css -->
 <style>
@@ -65,30 +65,37 @@
 			view : new ol.View({ // 지도가 보여 줄 중심좌표, 축소, 확대 등을 설정한다. 보통은 줌, 중심좌표를 설정하는 경우가 많다.
 				center : ol.proj
 						.fromLonLat([ 127, 37.5 ]), //위도, 경도 였구먼
-				zoom : 10
+				zoom : 10,
+				
 			}),
 			controls : ol.control.defaults().extend([ 
 						new ol.control.Zoom() // Zoom 컨트롤 추가
+
 					])
+			
 		});
 				/* mapOverlay = new ol.Overlay(({ element: container })); //Overlay 생성, 요소는 컨테이너 */
 
 				$('#sdselect').on('change',	function() {
-					var sd = $('#sd option:selected').text();
+					//var sd = $('#sd option:selected').text();
+					var sd = $("option:selected", this).attr("value");
+					
 			/* var sgg = $('#sgg option:selected').val();
 				var bjd = $('#bjd option:selected').val(); */
-
+				console.log(sd);
+				/* var jsonData = JSON.parse(sd);  // 받아온 데이터를 JavaScript 객체로 변환  */
+	
 					 $.ajax({
 						url : '/selectSgg.do', // 컨트롤러의 URL
-						type : 'POST', // HTTP 메소드
+						type : 'post', // HTTP 메소드
 						dataType : 'json', // 응답 데이터 타입
 						data :{"sd" : sd},
 						success : function(data) {
 							 $("#sgg").empty();
 				               var sgg = "<option>시군구 선택</option>";
 				               
-				               for(var i=0;i<result.length;i++){
-				                  sgg += "<option value='"+result[i].sgg_cd+"'>"+result[i].sgg_nm+"</option>"
+				               for(var i=0;i<data.length;i++){
+				                  sgg += "<option value='"+data[i].sgg_cd+"'>"+data[i].sgg_nm+"</option>"
 				               }
 				               
 				               $("#sgg").append(sgg);
