@@ -1,6 +1,7 @@
 package servlet.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -10,6 +11,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import servlet.VO.ServletVO;
 import servlet.service.ServletService;
@@ -19,8 +21,8 @@ public class ServletController {
 	@Resource(name = "ServletService")
 	private ServletService servletService;
 	
-	@RequestMapping(value = {"/main.do", "/selectSgg.do"}, method = {RequestMethod.GET, RequestMethod.POST})
-	public String mainTest(ModelMap model, @RequestParam(name="sd", required = false, defaultValue = "") String sd) throws Exception {
+	@RequestMapping(value = {"/main.do"}, method = RequestMethod.GET)
+	public String mainTest(ModelMap model) throws Exception {
 		System.out.println("sevController.java - mainTest()");
 		
 		String str = servletService.addStringTest("START! ");
@@ -34,19 +36,33 @@ public class ServletController {
 		
 		System.out.println("sdlist");
 		
-		List<ServletVO> sgglist = servletService.sgglist();
-		model.addAttribute("sgglist",sgglist);
-		
-		System.out.println("sgglist");
-		
-		List<ServletVO> bjdlist = servletService.bjdlist();
-		model.addAttribute("bjdlist",bjdlist);
-		
-		System.out.println("bjdlist");
+		/*
+		 * List<ServletVO> sgglist = servletService.sgglist();
+		 * model.addAttribute("sgglist",sgglist);
+		 * 
+		 * System.out.println("sgglist");
+		 * 
+		 * List<ServletVO> bjdlist = servletService.bjdlist();
+		 * model.addAttribute("bjdlist",bjdlist);
+		 * 
+		 * System.out.println("bjdlist");
+		 */
 		
 		return "main/main";
 	}
 	
+	@RequestMapping(value = "/selectedSD.do", method = RequestMethod.POST,  produces = "application/json;charset=UTF8")
+	 @ResponseBody 
+	 public List<ServletVO> testPage(@RequestParam("sdcdparam") String sdcdparam) {
+	      
+	      System.out.println(sdcdparam);
+	      
+	      List<ServletVO> sgglist = servletService.sgglist(sdcdparam);
+	      System.out.println(sgglist);
+	      
+	      return sgglist;
+	   }
+
 	
 	
 }

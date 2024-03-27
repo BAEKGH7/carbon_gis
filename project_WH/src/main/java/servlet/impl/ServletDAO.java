@@ -1,6 +1,7 @@
 package servlet.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,8 @@ public class ServletDAO extends EgovComAbstractDAO {
 	}
 
 
-	public List<ServletVO> sgglist() {
-		return selectList("servlet.tl_sgg");
+	public List<ServletVO> sgglist(String sdcdparam) {
+		return selectList("servlet.tl_sgg", sdcdparam);
 	}
 
 

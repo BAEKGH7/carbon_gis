@@ -1,6 +1,7 @@
 package servlet.service;
 
 import java.util.List;
+import java.util.Map;
 
 import servlet.VO.ServletVO;
 
@@ -12,5 +13,5 @@ public interface ServletService {
 	
 	List<ServletVO> bjdlist();
 
-	List<ServletVO> sgglist();
+	List<ServletVO> sgglist(String sdcdparam);
 }

@@ -13,11 +13,12 @@
 		]]>
 	</select>
 	
-	<select id="tl_sd" resultType="ServletVO">
+	<select id="tl_sd"  resultType="ServletVO">
 	select distinct sd_cd, sd_nm from tl_sd
 	</select>
-	<select id="tl_sgg" resultType="ServletVO">
+	<select id="tl_sgg" parameterType="String" resultType="ServletVO">
 	select distinct sgg_nm, sgg_cd, sd_nm from tl_sgg
+	where sgg_cd like concat(#{sdcdparam},'%')
 	</select>
 	<select id="tl_bjd" resultType="ServletVO">
 	select distinct bjd_nm, bjd_cd, sgg_cd from tl_bjd

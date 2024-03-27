@@ -16,7 +16,10 @@
 <!-- OpenLayer css -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/css/ol.css">
 <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/build/ol.js"></script> 
-<script type="text/javascript" src="<c:url value='/js/mapTest.js' />"></script>
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/ol@v9.1.0/dist/ol.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.1.0/ol.css"> -->
+<%-- <script type="text/javascript" src="<c:url value='/js/mapTest.js' />"></script> --%>
 <!-- 지도 맵객체 생성을 위한 js-->
 <!-- 지도 크기 설정을 위한 css -->
 <style>
@@ -78,27 +81,31 @@
 
 				$('#sdselect').on('change',	function() {
 					//var sd = $('#sd option:selected').text();
-					var sd = $("option:selected", this).attr("value");
+					var sdcdparam = $("option:selected", this).attr("value");
 					
 			/* var sgg = $('#sgg option:selected').val();
 				var bjd = $('#bjd option:selected').val(); */
-				console.log(sd);
+				console.log(sdcdparam);
 				/* var jsonData = JSON.parse(sd);  // 받아온 데이터를 JavaScript 객체로 변환  */
 	
 					 $.ajax({
-						url : '/selectSgg.do', // 컨트롤러의 URL
+						url : '/selectedSD.do', // 컨트롤러의 URL
 						type : 'post', // HTTP 메소드
 						dataType : 'json', // 응답 데이터 타입
-						data :{"sd" : sd},
+						data :{"sdcdparam" : sdcdparam},
 						success : function(data) {
-							 $("#sgg").empty();
-				               var sgg = "<option>시군구 선택</option>";
-				               
+							
+							console.log(data);
+							console.log(data[0]);
+							var sgg = $("#sggselect");
+							$("#sggselect").empty();
+				              sgg.html("<option>시군구 선택</option>");
+				               /* var jsonData = JSON.parse(data); */
 				               for(var i=0;i<data.length;i++){
-				                  sgg += "<option value='"+data[i].sgg_cd+"'>"+data[i].sgg_nm+"</option>"
+				                  sgg.append("<option value='"+data[i].sgg_cd+"'>"+data[i].sgg_nm+"</option>");
 				               }
 				               
-				               $("#sgg").append(sgg);
+				               $("#sggselect").append(sgg);
 				            },
 				            error : function() {
 				               alert("실패");
@@ -233,9 +240,8 @@
 						</c:forEach>
 					</select> <select id="sggselect">
 						<option value="">시군구 선택</option>
-					</select> <select id="bjdselect">
-						<option value="">법정동 선택</option>
-					</select> <select>
+					</select> 
+					 <select>
 						<option selected="selected">범례 선택</option>
 					</select>
 

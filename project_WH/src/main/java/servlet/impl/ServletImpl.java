@@ -1,6 +1,7 @@
 package servlet.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -28,12 +29,15 @@ public class ServletImpl extends EgovAbstractServiceImpl implements ServletServi
 		return dao.sdlist();
 	}
 	@Override
-	public List<ServletVO> sgglist() {
-		return dao.sgglist();
+	public List<ServletVO> sgglist(String sdcdparam) {
+		return dao.sgglist(sdcdparam);
 		}
 
 	@Override
 	public List<ServletVO> bjdlist() {
 		return dao.bjdlist();
-		}
+	}
+	
+	
+	
 }
