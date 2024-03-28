@@ -67,8 +67,8 @@
 					}) ],
 			view : new ol.View({ // 지도가 보여 줄 중심좌표, 축소, 확대 등을 설정한다. 보통은 줌, 중심좌표를 설정하는 경우가 많다.
 				center : ol.proj
-						.fromLonLat([ 127, 37.5 ]), //위도, 경도 였구먼
-				zoom : 10,
+						.fromLonLat([ 127, 36.5 ]), //위도, 경도 였구먼
+				zoom : 8,
 				
 			}),
 			controls : ol.control.defaults().extend([ 
@@ -79,21 +79,68 @@
 		});
 				/* mapOverlay = new ol.Overlay(({ element: container })); //Overlay 생성, 요소는 컨테이너 */
 
+				var wmssgg;
+				var wmsbjd;
 				$('#sdselect').on('change',	function() {
 					//var sd = $('#sd option:selected').text();
 					var sdcdparam = $("option:selected", this).attr("value");
+
+					console.log(sdcdparam);
+					
+					
+					/* var sd_CQL = "sd_nm="+$("option:selected", this).text(); */
+
+					/* console.log(sd_CQL); */
+					
 					
 			/* var sgg = $('#sgg option:selected').val();
 				var bjd = $('#bjd option:selected').val(); */
-				console.log(sdcdparam);
 				/* var jsonData = JSON.parse(sd);  // 받아온 데이터를 JavaScript 객체로 변환  */
-	
+				
 					 $.ajax({
 						url : '/selectedSD.do', // 컨트롤러의 URL
 						type : 'post', // HTTP 메소드
 						dataType : 'json', // 응답 데이터 타입
 						data :{"sdcdparam" : sdcdparam},
 						success : function(data) {
+							
+							// 서버로부터 받은 데이터 중 sgg_cd 값만 추출하여 sd_CQL에 할당
+				            var sgg_cd_values = data.map(function(item) {
+				                return "'" + item.sgg_cd + "'";
+				            });
+							
+				            sd_CQL = "sgg_cd IN (" + sgg_cd_values.join(",") + ")";
+							
+				            map.removeLayer(wmssgg);
+				            map.removeLayer(wmsbjd);
+							 wmssgg = new ol.layer.Tile(
+										{	
+											properties: { name: 'wmssgg' },
+											source : new ol.source.TileWMS(
+													{	
+														url : 'http://localhost/geoserver/baek1/wms?service=WMS', // 1. 레이어 URL
+														params : {
+															'VERSION' : '1.1.0', // 2. 버전
+															'LAYERS' : 'baek1:tl_sgg', // 3. 작업공간:레이어 명
+															'BBOX' : [ 1.386872E7,
+																	3906626.5,
+																	1.4428071E7,
+																	4670269.5 ],
+															'CQL_FILTER' : "sgg_cd IN (" + sgg_cd_values.join(",") + ")",
+															'SRS' : 'EPSG:3857', // SRID
+															'FORMAT' : 'image/png' // 포맷
+
+														},
+														serverType : 'geoserver',
+													})
+										});
+								
+								map.addLayer(wmssgg); // 맵 객체에 레이어를 추가함	
+								
+							
+								console.log(sd_CQL);
+							
+							
 							
 							console.log(data);
 							console.log(data[0]);
@@ -106,13 +153,40 @@
 				               }
 				               
 				               $("#sggselect").append(sgg);
+				               
+				               
+				               var wmsbjd = new ol.layer.Tile(
+										{
+											source : new ol.source.TileWMS(
+													{
+														url : 'http://localhost/geoserver/baek1/wms?service=WMS', // 1. 레이어 URL
+														params : {
+															'VERSION' : '1.1.0', // 2. 버전
+															'LAYERS' : 'baek1:tl_bjd', // 3. 작업공간:레이어 명
+															'BBOX' : [ 1.3873946E7,
+																	3906626.5,
+																	1.4428045E7,
+																	4670269.5 ],
+															'CQL_FILTER' : "bjd_cd=11590101",
+															'SRS' : 'EPSG:3857', // SRID
+															'FORMAT' : 'image/png' // 포맷
+
+														},
+														serverType : 'geoserver',
+													})
+										});
+								map.addLayer(wmsbjd); // 맵 객체에 레이어를 추가함  
+				               
+				               
+				              	
+				               
 				            },
 				            error : function() {
 				               alert("실패");
 				            }
 				         })
 				      }); 
-				
+	});
 				
 				/* 	 $("#sdselect").on("change", function() {
 				 var test = $("#sdselect option:checked").text();
@@ -145,7 +219,7 @@
 				 var sd_CQL = "sd_cd="+$("#sdselect").val();
 				 var sgg_CQL = "sgg_cd="+$("#sgg").val(); */
 
-				var wmssd = new ol.layer.Tile(
+				/* var wmssd = new ol.layer.Tile(
 						{
 							source : new ol.source.TileWMS(
 									{
@@ -166,31 +240,11 @@
 										serverType : 'geoserver',
 									})
 						});
-				map.addLayer(wmssd); // 맵 객체에 레이어를 추가함
+				map.addLayer(wmssd); // 맵 객체에 레이어를 추가함 */
 
-				var wmssgg = new ol.layer.Tile(
-						{
-							source : new ol.source.TileWMS(
-									{
-										url : 'http://localhost/geoserver/baek1/wms?service=WMS', // 1. 레이어 URL
-										params : {
-											'VERSION' : '1.1.0', // 2. 버전
-											'LAYERS' : 'baek1:tl_sgg', // 3. 작업공간:레이어 명
-											'BBOX' : [ 1.386872E7,
-													3906626.5,
-													1.4428071E7,
-													4670269.5 ],
-											'CQL_FILTER' : "sgg_cd=11590",
-											'SRS' : 'EPSG:3857', // SRID
-											'FORMAT' : 'image/png' // 포맷
+				
 
-										},
-										serverType : 'geoserver',
-									})
-						});
-				map.addLayer(wmssgg); // 맵 객체에 레이어를 추가함	
-
-				var wmsbjd = new ol.layer.Tile(
+				/* var wmsbjd = new ol.layer.Tile(
 						{
 							source : new ol.source.TileWMS(
 									{
@@ -210,9 +264,9 @@
 										serverType : 'geoserver',
 									})
 						});
-				map.addLayer(wmsbjd); // 맵 객체에 레이어를 추가함 
+				map.addLayer(wmsbjd); // 맵 객체에 레이어를 추가함  
 
-			});
+			}); */
 
 	/* var myFullScreenControl = new ol.control.FullScreen();
 	 map.addControl(myFullScreenControl); */
