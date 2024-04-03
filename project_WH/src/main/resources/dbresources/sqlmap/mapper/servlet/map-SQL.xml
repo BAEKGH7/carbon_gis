@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="map">
+
+	<select id="getSdExtent" parameterType="int" resultType="map">
+	   select 
+	        (select ST_XMax(geom) as xmax FROM tl_sd WHERE sd_cd = #{sd_cd}::varchar order by xmax desc limit 1)
+	        ,(select ST_YMax(geom) as ymax FROM tl_sd WHERE  sd_cd =#{sd_cd}::varchar order by ymax desc limit 1)
+	        ,(select  ST_XMin(geom) as xmin FROM tl_sd WHERE  sd_cd = #{sd_cd}::varchar order by xmin  limit 1)
+	        ,(select ST_YMin(geom) as ymin FROM tl_sd WHERE  sd_cd = #{sd_cd}::varchar order by ymin limit 1)
+	    from tl_sd limit 1
+	</select>
+	
+	<select id="getSggExtent" parameterType="int" resultType="map">
+	   select 
+	        (select ST_XMax(geom) as xmax FROM tl_sgg WHERE sgg_cd = #{sgg_cd}::varchar order by xmax desc limit 1)
+	        ,(select ST_YMax(geom) as ymax FROM tl_sgg WHERE  sgg_cd =#{sgg_cd}::varchar order by ymax desc limit 1)
+	        ,(select  ST_XMin(geom) as xmin FROM tl_sgg WHERE  sgg_cd = #{sgg_cd}::varchar order by xmin  limit 1)
+	        ,(select ST_YMin(geom) as ymin FROM tl_sgg WHERE  sgg_cd = #{sgg_cd}::varchar order by ymin limit 1)
+	    from tl_sgg limit 1
+	</select>
+	
+	<select id="getCenter" parameterType="int" resultType="map">
+		SELECT st_x(st_centroid(geom)) as x, st_y(st_centroid(geom)) as y FROM public.tl_sd
+		WHERE sd_nm = '서울특별시'
+	</select>
+	
+	
+</mapper>
