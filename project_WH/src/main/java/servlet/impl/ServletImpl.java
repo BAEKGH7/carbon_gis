@@ -34,8 +34,8 @@ public class ServletImpl extends EgovAbstractServiceImpl implements ServletServi
 		}
 
 	@Override
-	public List<ServletVO> bjdlist() {
-		return dao.bjdlist();
+	public List<ServletVO> bjdlist(String sggcdparam) {
+		return dao.bjdlist(sggcdparam);
 	}
 	
 	

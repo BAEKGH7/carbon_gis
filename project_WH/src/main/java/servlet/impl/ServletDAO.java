@@ -30,8 +30,8 @@ public class ServletDAO extends EgovComAbstractDAO {
 	}
 
 
-	public List<ServletVO> bjdlist() {
-		return selectList("servlet.tl_bjd");
+	public List<ServletVO> bjdlist(String sggcdparam) {
+		return selectList("servlet.tl_bjd", sggcdparam);
 	}
 
 }

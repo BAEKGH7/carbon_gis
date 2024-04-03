@@ -11,7 +11,8 @@ public interface ServletService {
 
 	List<ServletVO> sdlist();
 	
-	List<ServletVO> bjdlist();
-
 	List<ServletVO> sgglist(String sdcdparam);
+	
+	List<ServletVO> bjdlist(String sggcdparam);
+
 }

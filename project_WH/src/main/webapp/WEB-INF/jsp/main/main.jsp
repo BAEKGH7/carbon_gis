@@ -96,6 +96,8 @@
 			/* var sgg = $('#sgg option:selected').val();
 				var bjd = $('#bjd option:selected').val(); */
 				/* var jsonData = JSON.parse(sd);  // 받아온 데이터를 JavaScript 객체로 변환  */
+						
+		
 				
 					 $.ajax({
 						url : '/selectedSD.do', // 컨트롤러의 URL
@@ -104,6 +106,8 @@
 						data :{"sdcdparam" : sdcdparam},
 						success : function(data) {
 							
+							
+							
 							// 서버로부터 받은 데이터 중 sgg_cd 값만 추출하여 sd_CQL에 할당
 				            var sgg_cd_values = data.map(function(item) {
 				                return "'" + item.sgg_cd + "'";
@@ -111,6 +115,7 @@
 							
 				            sd_CQL = "sgg_cd IN (" + sgg_cd_values.join(",") + ")";
 							
+
 				            map.removeLayer(wmssgg);
 				            map.removeLayer(wmsbjd);
 							 wmssgg = new ol.layer.Tile(
@@ -126,7 +131,7 @@
 																	3906626.5,
 																	1.4428071E7,
 																	4670269.5 ],
-															'CQL_FILTER' : "sgg_cd IN (" + sgg_cd_values.join(",") + ")",
+															'CQL_FILTER' : sd_CQL,
 															'SRS' : 'EPSG:3857', // SRID
 															'FORMAT' : 'image/png' // 포맷
 
@@ -136,6 +141,7 @@
 										});
 								
 								map.addLayer(wmssgg); // 맵 객체에 레이어를 추가함	
+								
 								
 							
 								console.log(sd_CQL);
@@ -154,39 +160,110 @@
 				               
 				               $("#sggselect").append(sgg);
 				               
+				               $.ajax({
+									url : '/ZoomSd.do', // 컨트롤러의 URL
+									type : 'post', // HTTP 메소드
+									dataType : 'json', // 응답 데이터 타입
+									data :{"sdcdparam" : sdcdparam},
+									success : function(data) {
+										//시도 선택 시 좌표 이동을 위해
+										const sdExtent = data.sdExtent;
+							            console.log(sdExtent);
+										map.getView().fit([sdExtent.xmin, sdExtent.ymin, sdExtent.xmax, sdExtent.ymax], {duration : 600});
+									},error: function(error) {
+										alert("SD zoom 실패: " + error);
+									}
+							   });
 				               
-				               var wmsbjd = new ol.layer.Tile(
-										{
-											source : new ol.source.TileWMS(
-													{
-														url : 'http://localhost/geoserver/baek1/wms?service=WMS', // 1. 레이어 URL
-														params : {
-															'VERSION' : '1.1.0', // 2. 버전
-															'LAYERS' : 'baek1:tl_bjd', // 3. 작업공간:레이어 명
-															'BBOX' : [ 1.3873946E7,
-																	3906626.5,
-																	1.4428045E7,
-																	4670269.5 ],
-															'CQL_FILTER' : "bjd_cd=11590101",
-															'SRS' : 'EPSG:3857', // SRID
-															'FORMAT' : 'image/png' // 포맷
+				               
+				               var sggcdparam;
+				               $('#sggselect').on('change',	function() {
+									sggcdparam = $("option:selected", this).attr("value");
 
-														},
-														serverType : 'geoserver',
-													})
-										});
-								map.addLayer(wmsbjd); // 맵 객체에 레이어를 추가함  
+									console.log(sggcdparam);
+									
+									
+									
+						            
+						            
+						            map.removeLayer(wmsbjd);
+									
+								
+									 $.ajax({
+										url : '/selectedSgg.do', // 컨트롤러의 URL
+										type : 'post', // HTTP 메소드
+										dataType : 'json', // 응답 데이터 타입
+										data :{"sggcdparam" : sggcdparam},
+										success : function(data) {
+								            console.log(data);
+								            
+								            
+											
+											// 서버로부터 받은 데이터 중 bjd_cd 값만 추출하여 sd_CQL에 할당
+								            var bjd_cd_values = data.map(function(item) {
+								                return "'" + item.bjd_cd + "'";
+								            });
+											
+								            sgg_CQL = "bjd_cd IN (" + bjd_cd_values.join(",") + ")";
+
+								            console.log(sgg_CQL);
+								            
+								            
+								            $.ajax({
+												url : '/ZoomSgg.do', // 컨트롤러의 URL
+												type : 'post', // HTTP 메소드
+												dataType : 'json', // 응답 데이터 타입
+												data :{"sggcdparam" : sggcdparam},
+												success : function(data) {
+													//시도 선택 시 좌표 이동을 위해
+													const sggExtent = data.sggExtent;
+										            console.log(sggExtent);
+										            map.getView().fit([sggExtent.xmin, sggExtent.ymin, sggExtent.xmax, sggExtent.ymax], {duration : 500});
+										            
+												},error: function(error) {
+													alert("Sgg zoom 실패: " + error);
+												}
+										   });
+								            
+								            
+								            map.removeLayer(wmsbjd);
+											wmsbjd = new ol.layer.Tile(
+														{	
+															properties: { name: 'wmsbjd' },
+															source : new ol.source.TileWMS(
+																	{	
+																		url : 'http://localhost/geoserver/baek1/wms?service=WMS', // 1. 레이어 URL
+																		params : {
+																			'VERSION' : '1.1.0', // 2. 버전
+																			'LAYERS' : 'baek1:tl_bjd', // 3. 작업공간:레이어 명
+																			'BBOX' : [ 1.3873946E7,
+																					3906626.5,
+																					1.4428045E7,
+																					4670269.5 ],
+																			'CQL_FILTER' : sgg_CQL,
+																			'SRS' : 'EPSG:3857', // SRID
+																			'FORMAT' : 'image/png' // 포맷
+
+																		},
+																		serverType : 'geoserver',
+																	})
+														});
+												
+												map.addLayer(wmsbjd); // 맵 객체에 레이어를 추가함	
 				               
-				               
-				              	
 				               
 				            },
 				            error : function() {
 				               alert("실패");
 				            }
-				         })
-				      }); 
-	});
+				         });
+						});
+
+			            }
+			         });      
+
+		         }); 
+    }); 
 				
 				/* 	 $("#sdselect").on("change", function() {
 				 var test = $("#sdselect option:checked").text();
@@ -270,6 +347,7 @@
 
 	/* var myFullScreenControl = new ol.control.FullScreen();
 	 map.addControl(myFullScreenControl); */
+	 
 </script>
 
 </head>
@@ -292,7 +370,8 @@
 						<c:forEach items="${sdlist }" var="sd">
 							<option class="sd" value="${sd.sd_cd }">${sd.sd_nm}</option>
 						</c:forEach>
-					</select> <select id="sggselect">
+					</select>
+					 <select id="sggselect">
 						<option value="">시군구 선택</option>
 					</select> 
 					 <select>
