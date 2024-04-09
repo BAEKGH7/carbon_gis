@@ -6,6 +6,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.js"
 	integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
 	crossorigin="anonymous"></script>
@@ -16,6 +17,9 @@
 <!-- OpenLayer css -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/css/ol.css">
 <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/build/ol.js"></script> 
+
+<!-- Bootstrap -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
 <!-- <script src="https://cdn.jsdelivr.net/npm/ol@v9.1.0/dist/ol.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.1.0/ol.css"> -->
@@ -169,7 +173,7 @@
 										//시도 선택 시 좌표 이동을 위해
 										const sdExtent = data.sdExtent;
 							            console.log(sdExtent);
-										map.getView().fit([sdExtent.xmin, sdExtent.ymin, sdExtent.xmax, sdExtent.ymax], {duration : 600});
+										map.getView().fit([sdExtent.xmin, sdExtent.ymin, sdExtent.xmax, sdExtent.ymax], {duration : 700});
 									},error: function(error) {
 										alert("SD zoom 실패: " + error);
 									}
@@ -218,7 +222,7 @@
 													//시도 선택 시 좌표 이동을 위해
 													const sggExtent = data.sggExtent;
 										            console.log(sggExtent);
-										            map.getView().fit([sggExtent.xmin, sggExtent.ymin, sggExtent.xmax, sggExtent.ymax], {duration : 500});
+										            map.getView().fit([sggExtent.xmin, sggExtent.ymin, sggExtent.xmax, sggExtent.ymax], {duration : 700});
 										            
 												},error: function(error) {
 													alert("Sgg zoom 실패: " + error);
@@ -263,90 +267,89 @@
 			         });      
 
 		         }); 
+	 
+	 //메시지~
+		 let toastBox = document.getElementById('toastBox');
+		//let loadingMsg = '로딩 중';
+		let successMsg = '<i class="fa-solid fa-circle-check"></i> 파일 업로드 성공';
+		let failMsg = '<i class="fa-solid fa-circle-xmark"></i> 파일 업로드 실패';
+		let loadingToast = $("#loadingToast");
+		loadingToast.hide();
+	 
+	 
+		function showResultToast(msg) {
+		    let toast = document.createElement('div');
+		    toast.classList.add('toast1');
+		    toast.innerHTML = msg;
+		    
+		    let toastBox = document.getElementById('toastBox'); // toastBox 요소를 가져옴
+		    
+		    if (toastBox) { // toastBox가 존재하는 경우에만 실행
+		        toastBox.appendChild(toast);
+		        
+		        if (msg.includes('실패')) {
+		            toast.classList.add('fail');
+		        } else if (msg.includes('성공')) {
+		            toast.classList.add('success');
+		        }
+		        
+		        setTimeout(function() {
+		            toast.remove();
+		        }, 3000);
+		    } else {
+		        console.error('Toast container not found.'); // toastBox가 존재하지 않는 경우 콘솔에 오류 메시지 출력
+		    }
+		}
+				
+	// 파일 업로드
+		$("#uploadBtn").on("click", function() {
+			
+			let fileName = $('#txtfile').val();
+			let extension =  fileName.slice((fileName.lastIndexOf('.') - 1 >>> 0) + 2).toLowerCase();
+			console.log(fileName);
+			console.log(extension);
+		
+			
+			if (extension == 'txt') {
+				// FormData 객체 생성
+				let formData = new FormData(document.getElementById('uploadForm'));
+				
+				$.ajax({
+					url: "/uploadTxt.do", 
+					type: "post", 
+					enctype: "multipart/form-data", //폼 데이터가 파일 업로드와 함께 전송되는 것을 지정
+					data: formData, 
+					cache: false, 
+					processData: false, 
+					contentType: false, 
+					success: function(data) {
+						let result = JSON.parse(data);
+						console.log(result);
+						showResultToast(successMsg + '(' + result.result + ' lines)<br>경과 시간: ' + result.timeElapsed + '초');
+						loadingToast.remove();
+					}, 
+					error: function(xhr, status, error) {
+		                console.error(xhr.responseText); //서버에서 전달된 오류메시지
+		                alert("통신 실패: " + error);
+		                showResultToast(failMsg);
+		                loadingToast.remove();
+					}
+		        });
+			} else if (!extension) {
+				return false; 
+			} else {
+				alert("txt 파일만 업로드 가능합니다.");
+			}
+				
+			
+		});
+		
+
     }); 
 				
-				/* 	 $("#sdselect").on("change", function() {
-				 var test = $("#sdselect option:checked").text();
-				 $.ajax({
-				 url : "/selectSgg.do",
-				 type : "post",
-				 dataType : "json",
-				 data : {"test" : test},
-				 success : function(result) {
-				 $("#sgg").empty();
-				 var sgg = "<option>시군구 선택</option>";
-				
-				 for(var i=0;i<result.length;i++){
-				 sgg += "<option value='"+result[i].sgg_cd+"'>"+result[i].sgg_nm+"</option>"
-				 }
-				 $("#sgg").append(sgg);
-				 },
-				 error : function() {
-				 alert("실패");
-				 }
-				 })
-				 });
-
-				 $(".insertbtn").click(function() {
-
-				 map.removeLayer(sd);
-				 map.removeLayer(sgg);
-				 map.removeLayer(bjd);
-				
-				 var sd_CQL = "sd_cd="+$("#sdselect").val();
-				 var sgg_CQL = "sgg_cd="+$("#sgg").val(); */
-
-				/* var wmssd = new ol.layer.Tile(
-						{
-							source : new ol.source.TileWMS(
-									{
-										url : 'http://localhost/geoserver/baek1/wms?service=WMS', // 1. 레이어 URL
-										params : {
-											'VERSION' : '1.1.0', // 2. 버전
-											'LAYERS' : 'baek1:tl_sd', // 3. 작업공간:레이어 명
-											'BBOX' : [
-													1.386872E7,
-													3906626.5,
-													1.4680011171788167E7,
-													4670269.5 ],
-											'CQL_FILTER' : "id=17",
-											'SRS' : 'EPSG:3857', // SRID
-											'FORMAT' : 'image/png' // 포맷
-
-										},
-										serverType : 'geoserver',
-									})
-						});
-				map.addLayer(wmssd); // 맵 객체에 레이어를 추가함 */
-
-				
-
-				/* var wmsbjd = new ol.layer.Tile(
-						{
-							source : new ol.source.TileWMS(
-									{
-										url : 'http://localhost/geoserver/baek1/wms?service=WMS', // 1. 레이어 URL
-										params : {
-											'VERSION' : '1.1.0', // 2. 버전
-											'LAYERS' : 'baek1:tl_bjd', // 3. 작업공간:레이어 명
-											'BBOX' : [ 1.3873946E7,
-													3906626.5,
-													1.4428045E7,
-													4670269.5 ],
-											'CQL_FILTER' : "bjd_cd=11590101",
-											'SRS' : 'EPSG:3857', // SRID
-											'FORMAT' : 'image/png' // 포맷
-
-										},
-										serverType : 'geoserver',
-									})
-						});
-				map.addLayer(wmsbjd); // 맵 객체에 레이어를 추가함  
-
-			}); */
-
-	/* var myFullScreenControl = new ol.control.FullScreen();
-	 map.addControl(myFullScreenControl); */
+	 
+	 
+	 
 	 
 </script>
 
@@ -379,12 +382,23 @@
 					</select>
 
 					<button class="insertbtn">입력하기</button>
+					
 
-					<form id="uploadForm">
+					<!-- <form id="uploadForm">
 						<input type="file" accept=".txt" id="txtfile" name="txtfile">
+					</form> -->
+					<div>
+					<form id="uploadForm">
+						<input type="file" id="txtfile" name="file" accept="text" placeholder="txt 파일 업로드" required>
 					</form>
+						<button type="button" id="uploadBtn">파일 업로드</button>
+			</div>
 				</div>
 
+			</div>
+			
+			<div id="toastBox">
+				<div class="toast1" id="loadingToast"><i class="fa-solid fa-circle-arrow-up"></i> 업로드 진행 중...</div>
 			</div>
 		</div>
 		
