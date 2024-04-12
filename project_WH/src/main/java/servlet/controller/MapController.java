@@ -58,22 +58,25 @@ public class MapController {
 		//System.out.println(file);
 		int result = 0;
 		
+		long startTime = System.currentTimeMillis();
 		if(Util.isValidTxtFile(file)) {
 			System.out.println(file.getName());
 			System.out.println(file.getSize());
 			System.out.println(file.getContentType());
 			System.out.println(file.getOriginalFilename());
 			
-			long startTime = System.currentTimeMillis();
 			result = fileService.uploadFile(file);
 			long endTime = System.currentTimeMillis();
 			long timeElapsed = endTime - startTime;
 			//System.out.println("처리 시간(분): " + (processingTime));
 			
-			JSONObject json = new JSONObject();
-			json.put("result", result);
 			double processingTime = (double) timeElapsed / 1000;
+			
+			JSONObject json = new JSONObject();
+
+			json.put("result", result);
 			json.put("timeElapsed", processingTime);
+
 			
 			return json.toString();
 			

@@ -40,6 +40,34 @@
 	right: 20px;
 	top: 20px;
 }
+
+/* 스낵바 스타일 */
+.toast1 {
+    position: fixed;
+    bottom: 20px; /* 원하는 위치에 배치합니다 */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    z-index: 999; /* 다른 요소 위에 표시될 수 있도록 z-index 설정 */
+}
+
+/* progress bar 스타일 */
+.progress {
+    height: 20px; /* 원하는 높이로 조정합니다 */
+    margin-top: 10px; /* progress bar 위 간격 조정 */
+}
+
+.progress-bar {
+    background-color: #007bff; /* progress bar 색상 */
+    text-align: center; /* 텍스트 가운데 정렬 */
+    line-height: 20px; /* 텍스트 수직 가운데 정렬 */
+    font-size: 14px; /* 텍스트 크기 */
+    border-radius: 5px; /* progress bar 둥근 모서리 */
+}
+
 </style>
 
 <script type="text/javascript">
@@ -311,8 +339,20 @@
 		
 			
 			if (extension == 'txt') {
+
+		        // 업로드 시작 시 메시지 표시
+		        loadingToast.show();
+				
 				// FormData 객체 생성
 				let formData = new FormData(document.getElementById('uploadForm'));
+		        let file = $('#txtfile')[0].files[0]; // 파일 객체 가져오기
+		        
+		        if (file) {
+		        formData.append('file', file); // 파일 추가
+				
+		        let progressBar = $('#progressBar');
+				progressBar.css('width', '0%'); // 초기 너비 설정
+	            progressBar.text('0%'); // 초기 텍스트 설정
 				
 				$.ajax({
 					url: "/uploadTxt.do", 
@@ -322,34 +362,50 @@
 					cache: false, 
 					processData: false, 
 					contentType: false, 
+					xhr: function() {
+		                let xhr = new window.XMLHttpRequest();
+		                
+		             // progress 이벤트 리스너 등록
+		                xhr.upload.addEventListener('progress', function(evt) {
+		                    if (evt.lengthComputable) {
+		                        let percentComplete = evt.loaded / evt.total * 100;
+		                        progressBar.css('width', percentComplete + '%'); // progressBar 업데이트
+	                            progressBar.text(percentComplete.toFixed(0) + '%'); // 텍스트 업데이트
+	                        }
+		                }, false);
+		                return xhr;
+		            },
+					
+					
 					success: function(data) {
 						let result = JSON.parse(data);
 						console.log(result);
 						showResultToast(successMsg + '(' + result.result + ' lines)<br>경과 시간: ' + result.timeElapsed + '초');
-						loadingToast.remove();
+						
+						 $('#uploadTime').text('업로드 시간: ' + result.timeElapsed + '밀리초'); // 업로드 시간을 progress bar 아래에 표시
 					}, 
 					error: function(xhr, status, error) {
 		                console.error(xhr.responseText); //서버에서 전달된 오류메시지
 		                alert("통신 실패: " + error);
 		                showResultToast(failMsg);
-		                loadingToast.remove();
-					}
+					},
+					complete: function() {
+	                    // 업로드가 완료되면 메시지 숨기기
+	                    loadingToast.hide();
+	                }
 		        });
+	            } else {
+		            alert("파일을 선택해주세요.");
+		        }
 			} else if (!extension) {
 				return false; 
 			} else {
 				alert("txt 파일만 업로드 가능합니다.");
 			}
-				
 			
 		});
 		
-
     }); 
-				
-	 
-	 
-	 
 	 
 </script>
 
@@ -364,7 +420,15 @@
          </c:forEach>
          </select>
          <button type="submit">선택</button> --%>
-
+		<div id="loadingToast" class="toast1">
+            <i class="fa-solid fa-circle-arrow-up"></i> 업로드 진행 중...
+            <!-- 파일 업로드 진행 상태를 나타내는 progress bar -->
+            <div class="progress">
+                <div id="progressBar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0%</div>
+            </div>
+             <div id="uploadTime"></div>
+        </div>
+        <div id="toastBox"></div>
 		<div class="container">
 			<div class="main">
 				<div class="btncon">
@@ -397,9 +461,9 @@
 
 			</div>
 			
-			<div id="toastBox">
+			<!-- <div id="toastBox">
 				<div class="toast1" id="loadingToast"><i class="fa-solid fa-circle-arrow-up"></i> 업로드 진행 중...</div>
-			</div>
+			</div> -->
 		</div>
 		
 	</div>
