@@ -13,12 +13,6 @@
 		</foreach>
 	</insert>
 	
-<!-- 	<update id="refreshMv">
-		REFRESH MATERIALIZED VIEW CONCURRENTLY mvdtbjd
-	</update>
-	
-	<update id="refreshMvSgg">
-		REFRESH MATERIALIZED VIEW CONCURRENTLY mvdtsgg
-	</update> -->
+
 	
 </mapper>

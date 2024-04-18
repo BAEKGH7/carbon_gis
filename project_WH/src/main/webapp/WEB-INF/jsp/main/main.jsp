@@ -21,6 +21,9 @@
 <!-- Bootstrap -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
+<!-- xeicon  -->
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/xeicon@2.3.3/xeicon.min.css">
+
 <!-- <script src="https://cdn.jsdelivr.net/npm/ol@v9.1.0/dist/ol.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.1.0/ol.css"> -->
 <%-- <script type="text/javascript" src="<c:url value='/js/mapTest.js' />"></script> --%>
@@ -28,7 +31,7 @@
 <!-- 지도 크기 설정을 위한 css -->
 <style>
 .map {
-	height: 1060px;
+	height: 100%;
 	width: 100%;
 }
 
@@ -68,6 +71,162 @@
     border-radius: 5px; /* progress bar 둥근 모서리 */
 }
 
+/* 일반적인 스타일 */
+body {
+    font-family: sans-serif;
+    margin: 5;
+    padding: 5;
+}
+
+#container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: row; /* columnd에서 row로 수정 - 메뉴랑 지도 가로배치 */
+    
+    
+}
+
+
+#menuBtn {
+    width: 12%; /* 좌측 메뉴 너비 설정 */
+    min-width: 100px; /* 최소 너비 설정 */
+    height: 100vh;
+    background-color: #5D5D5D;
+    padding: 20px;
+    overflow-y: auto; /* 메뉴가 너무 길 경우 스크롤 표시 */
+    flex-direction: row;
+}
+
+
+
+/* 좌측 메뉴 스타일 */
+#menu {
+    width: 20%; /* 메뉴 우측 메뉴 너비 설정 */
+    min-width: 200px; /* 최소 너비 설정 */
+    height: 100vh;
+    background-color: #f0f0f0;
+    padding: 20px;
+    overflow-y: auto; /* 메뉴가 너무 길 경우 스크롤 표시 */
+}
+/* 메뉴에 hover 적용 */
+.icon:hover {
+    background-color: #6799FF; 
+    cursor: pointer; /* 마우스 포인터 모양으로 변경 */
+}
+
+
+/* 우측 지도 스타일 */
+#map {
+    flex: 1; /* 우측 지도가 남은 공간을 모두 차지하도록 함 */
+    height: 100vh;
+}
+
+/* 헤더 스타일 */
+header {
+    background-color: #f0f0f0;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 5px;
+    margin: 10;
+}
+
+/* 네비게이션 스타일 */
+nav {
+    background-color: #fff;
+    padding: 20px;
+    display: flex;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+}
+
+nav ul li a:hover {
+    color: #007bff;
+}
+
+/* 콘텐츠 스타일 */
+main {
+    flex: 1;
+    padding: 20px;
+}
+
+/* 양식 스타일 */
+form {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+form label {
+    margin-bottom: 5px;
+}
+
+form input, form select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+form button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #0056b3;
+}
+
+/* 통계 스타일 */
+.statistics {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.statistics h2 {
+    margin-bottom: 20px;
+}
+
+.statistics .chart {
+    width: 100%;
+    height: 300px;
+    margin-bottom: 20px;
+}
+
+/* 바닥글 스타일 */
+footer {
+    background-color: #f0f0f0;
+    padding: 20px;
+    text-align: center;
+}
+
+
+
 </style>
 
 <script type="text/javascript">
@@ -82,8 +241,35 @@
 	var mapView; //맵 뷰 선언 : 보여지는 지도 부분 설정
 	var hover = null; //마우스 이벤트에 사용될 변수
 	/* https://blog.naver.com/mango_tree_/222285880138 참고 */
+	
+	
+
+	
 
 	$(document).ready(function() {
+		
+		/* 메뉴 클릭 관련 */
+		$(document).ready(function() {
+	    // 초기 상태 설정
+	    $('.btncon').show(); // btncon 클래스를 가진 요소를 표시
+	    $('.uploadForm').hide(); // uploadForm 클래스를 가진 요소를 숨김
+
+	    // 탄소공간지도 아이콘 클릭 시
+	    $('#carbonIcon').click(function() {
+	        $('.btncon').show(); // btncon 클래스를 가진 요소를 표시
+	        $('.uploadForm').hide(); // uploadForm 클래스를 가진 요소를 숨김
+	    });
+
+	    // 업로드 아이콘 클릭 시
+	    $('#uploadIcon').click(function() {
+	        $('.btncon').hide(); // btncon 클래스를 가진 요소를 숨김
+	        $('.uploadForm').show(); // uploadForm 클래스를 가진 요소를 표시
+	    });
+	});
+		
+
+		/* 지도 작동 관련 */
+		
 		map = new ol.Map(
 		{ // OpenLayer의 맵 객체를 생성한다.
 			target : 'map', // 맵 객체를 연결하기 위한 target으로 <div>의 id값을 지정해준다.
@@ -99,7 +285,7 @@
 					}) ],
 			view : new ol.View({ // 지도가 보여 줄 중심좌표, 축소, 확대 등을 설정한다. 보통은 줌, 중심좌표를 설정하는 경우가 많다.
 				center : ol.proj
-						.fromLonLat([ 127, 36.5 ]), //위도, 경도 였구먼
+						.fromLonLat([127.6, 36.5]), //위도, 경도 였구먼
 				zoom : 8,
 				
 			}),
@@ -321,6 +507,12 @@
 		            toast.classList.add('success');
 		        }
 		        
+		        // 팝업을 가운데 하단에 위치하도록 설정
+		        let screenHeight = window.innerHeight;
+		        let popupHeight = toast.offsetHeight;
+		        toast.style.bottom = (screenHeight - popupHeight - 20) + 'px'; // 20px는 하단 여백
+		        
+		        
 		        setTimeout(function() {
 		            toast.remove();
 		        }, 3000);
@@ -404,6 +596,8 @@
 			}
 			
 		});
+	
+	
 		
     }); 
 	 
@@ -411,16 +605,26 @@
 
 </head>
 <body>
-	<div id="map" class="map">
-	<div id="popup">
-		<!-- 실제 지도가 표출 될 영역 -->
-		<%-- <select id="loc" name="loc">
-         <c:forEach items="${list }" var="row">
-            <option value="${row.sidonm}" ${row.sidonm eq param.loc ? 'selected' : ''}>${row.sidonm}</option>
-         </c:forEach>
-         </select>
-         <button type="submit">선택</button> --%>
-		<div id="loadingToast" class="toast1">
+
+
+<div id="container">
+	<div id="menuBtn">
+	<br>
+		<div class="icon" id="carbonIcon" style="border:5px solid">
+	        <i class="xi-map-o"></i> <font color="white"><b>탄소공간지도</b></font>
+	    </div><br><br>
+	
+	<div class="icon" id="uploadIcon" style="border:5px solid">
+        <i class="xi-file-upload"></i> <font color=white><b>업로드</b></font>
+    </div><br><br>
+	
+	<div class="icon" id="statsIcon" style="border:5px solid">
+        <i class="xi-presentation"></i> <font color=white><b>통계</b></font>
+    </div>
+	
+	 </div>
+<div id="menu">
+            <div id="loadingToast" class="toast1">
             <i class="fa-solid fa-circle-arrow-up"></i> 업로드 진행 중...
             <!-- 파일 업로드 진행 상태를 나타내는 progress bar -->
             <div class="progress">
@@ -437,21 +641,22 @@
 						<c:forEach items="${sdlist }" var="sd">
 							<option class="sd" value="${sd.sd_cd }">${sd.sd_nm}</option>
 						</c:forEach>
-					</select>
+					</select><br>
 					 <select id="sggselect">
 						<option value="">시군구 선택</option>
-					</select> 
+					</select> <br>
 					 <select>
 						<option selected="selected">범례 선택</option>
-					</select>
+					</select><br>
 
-					<button class="insertbtn">입력하기</button>
-					
+					<button class="insertbtn">입력하기</button><br><br><br>
+					</div>
 
 					<!-- <form id="uploadForm">
 						<input type="file" accept=".txt" id="txtfile" name="txtfile">
 					</form> -->
-					<div>
+					
+					<div class="uploadForm">
 					<form id="uploadForm">
 						<input type="file" id="txtfile" name="file" accept="text" placeholder="txt 파일 업로드" required>
 					</form>
@@ -461,13 +666,17 @@
 
 			</div>
 			
-			<!-- <div id="toastBox">
-				<div class="toast1" id="loadingToast"><i class="fa-solid fa-circle-arrow-up"></i> 업로드 진행 중...</div>
-			</div> -->
-		</div>
+			
+		</div>	
+        
+
+	<div id="map" class="map">
+	<div id="popup"></div>
+	</div> 
 		
-	</div>
-	</div>
+        </div>
+	
+	
 	
 	
 	
